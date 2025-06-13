@@ -1,0 +1,44 @@
+{% extends "hello/layout.html" %}
+
+{% block title %}
+Currency Exchange
+{% endblock %}
+
+
+{% block extra_head %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('form').onsubmit = function() {
+            fetch('/exchange_rates/')
+            .then(response => response.json())
+            .then(data => {
+                // console.log(data);
+                const currency = document.querySelector('#currency').value.toUpperCase();
+                const rate = data.rates[currency];
+                if (rate !== undefined) {
+                    document.querySelector('#result').innerHTML = `1 EUR is equal to ${rate} ${currency}.`;
+                } else {
+                    document.querySelector('#result').innerHTML = 'Invalid Currency.';
+                }
+            })
+            .catch(error => {
+                console.log('Error: ', error)
+            });
+
+            return false;
+        }
+    })
+</script>
+{% endblock %}
+
+
+{% block body %}
+<h1>Currency Exchange API</h1>
+<form>
+    <input type="text" placeholder="Currency" id="currency">
+    <input type="submit" value="Convert">
+</form>
+<div id="result">
+
+</div>
+{% endblock %}

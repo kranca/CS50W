@@ -1,0 +1,29 @@
+{% extends "hello/layout.html" %}
+
+{% block title %}
+Hello
+{% endblock %}
+
+{% block extra_head %}
+<script>
+            
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('form').onsubmit = function() {
+            const name = document.querySelector('#name').value;
+            alert(`Hello, ${name}`)
+        }
+    });
+
+</script>
+{% endblock %}
+
+{% block body %}
+
+<h1>Hello!</h1>
+<form>
+    <input autofocus id="name" placeholder="Name" type="text">
+    <input type="submit">
+</form>
+
+
+{% endblock %}
