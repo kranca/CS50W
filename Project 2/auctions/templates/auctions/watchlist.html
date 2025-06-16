@@ -1,0 +1,13 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>My Watchlist</h2>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for listing in user_watchlist %}
+        {% include "auctions/partials/listing_card.html" %}
+    {% empty %}
+        <p>No listings in Watchlist.</p>
+    {% endfor %}
+    </div>
+{% endblock %}

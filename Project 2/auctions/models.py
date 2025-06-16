@@ -55,6 +55,7 @@ class Listing(models.Model):
         related_name="user_listings"
     )
     is_active = models.BooleanField(default=True)
+    watchers = models.ManyToManyField(User, related_name="watchlist", blank=True)
 
     def __str__(self):
         return f"{self.id}: {self.object_name}, active = {self.is_active}"
@@ -77,6 +78,23 @@ class Bid(models.Model):
 
     def __str__(self):
         return f"{self.id}: {self.listing.object_name}, offer = {self.offer}"
+
+class Comment(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="comments"
+    )
+    listing = models.ForeignKey(
+        Listing,
+        on_delete=models.CASCADE,
+        related_name="comments"
+    )
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Comment by {self.user.username} on {self.listing.object_name}"
 
 @receiver(post_save, sender=Bid)
 def update_listing_current_bid_on_save(sender, instance, **kwargs):

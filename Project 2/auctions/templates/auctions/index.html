@@ -1,15 +1,15 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Active Listings</h2>
-    <ul>
-        {% for listing in listings %}
-            <li>
-                <a href="{% url 'listing_view' listing.id %}">{{ listing }}</a>
-            </li>
-        {% empty %}
-            <li>No listings available.</li>
-        {% endfor %}
-    </ul>
-    
+  <h2>Active Listings</h2>
+
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for listing in listings %}
+      {% if listing.is_active %}
+        {% include "auctions/partials/listing_card.html" %}
+      {% endif %}
+    {% empty %}
+      <p>No listings available.</p>
+    {% endfor %}
+  </div>
 {% endblock %}

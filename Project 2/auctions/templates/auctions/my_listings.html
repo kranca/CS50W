@@ -1,0 +1,23 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>My Active Listings</h2>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for listing in active_listings %}
+        {% include "auctions/partials/listing_card.html" %}
+    {% empty %}
+        <p>No active listings available.</p>
+    {% endfor %}
+    </div>
+
+    <h2>My Closed Listings</h2>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for listing in closed_listings %}
+        {% include "auctions/partials/listing_card.html" %}
+    {% empty %}
+        <p>No closed listings available.</p>
+    {% endfor %}
+    </div>
+{% endblock %}

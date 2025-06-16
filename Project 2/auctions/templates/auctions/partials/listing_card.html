@@ -1,0 +1,25 @@
+<div class="col">
+    <div class="card h-100">
+      {% if listing.image %}
+        <a href="{% url 'listing_view' listing.id %}">
+          <img src="{{ listing.image }}"
+               class="card-img-top img-fluid"
+               style="max-height: 200px; object-fit: cover;"
+               alt="{{ listing.object_name }}">
+        </a>
+      {% endif %}
+      <div class="card-body">
+        <h5 class="card-title">
+          <a href="{% url 'listing_view' listing.id %}">
+            {{ listing.object_name }}
+          </a>
+        </h5>
+        <p class="card-text">{{ listing.description }}</p>
+      </div>
+      <div class="card-footer">
+        <small class="text-muted">
+          Current bid: ${{ listing.current_bid|default:listing.starting_bid }}
+        </small>
+      </div>
+    </div>
+  </div>

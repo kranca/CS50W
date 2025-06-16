@@ -1,8 +1,119 @@
 {% extends "auctions/layout.html" %}
+{% load crispy_forms_tags %}
 
 {% block body %}
-    <h2>{{ listing }}</h2>
-    {{ listing.object_name }}
-    {{ listing.description }}
-    
+
+<div class="container my-4">
+
+    <!-- Listing title -->
+    <h2 class="mb-4">{{ listing.object_name }}</h2>
+
+    <!-- Listing details in a card -->
+    <div class="card mb-4">
+        {% if listing.image %}
+            <img src="{{ listing.image }}" class="card-img-top img-fluid" style="max-height: 400px; object-fit: cover;" alt="{{ listing.object_name }}">
+        {% endif %}
+        <div class="card-body">
+            <h5 class="card-title">{{ listing.object_name }}</h5>
+            <p class="card-text">{{ listing.description }}</p>
+            <p><strong>Category:</strong> {{ listing.get_category_display }}</p>
+            <p><strong>Starting price:</strong> ${{ listing.starting_bid }}</p>
+            <p><strong>Current highest bid:</strong> ${{ listing.current_bid|default:listing.starting_bid }}</p>
+            {% if user.is_authenticated and user.username != listing.owner.username and listing.is_active %}
+                {% if is_in_watchlist %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="remove_watchlist">
+                        <button type="submit" class="btn btn-warning"> Remove from Watchlist</button>
+                    </form>
+                {% else %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="add_watchlist">
+                        <button type="submit" class="btn btn-success">add to Watchlist</button>
+                    </form>
+                {% endif %}
+            {% endif %}
+
+            <!-- Bids -->
+            <h6>Bids history:</h6>
+            <ul class="list-group mb-3">
+            {% for bid in bids %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ bid.user.username }}
+                <span class="badge bg-primary rounded-pill">${{ bid.offer }}</span>
+                </li>
+            {% empty %}
+                <li class="list-group-item">No bids yet.</li>
+            {% endfor %}
+            </ul>
+
+            <!-- Bid form or close button -->
+            {% if user.is_authenticated %}
+                {% if user.username != listing.owner.username and listing.is_active %}
+                    <form method="POST" class="row g-3">
+                        {% csrf_token %}
+                        <div class="col-auto">
+                            <input
+                                type="number"
+                                step="0.1"
+                                min="{{ listing.current_bid|default:listing.starting_bid|add:'0.01' }}"
+                                name="bid_value"
+                                value="{{ listing.current_bid|default:listing.starting_bid }}"
+                                class="form-control"
+                                placeholder="Your bid"
+                            >
+                            <input type="hidden" name="action" value="bid">
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-success mb-3">Place Bid</button>
+                        </div>
+                    </form>
+                {% elif user.username == listing.owner.username and listing.is_active %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="close">
+                        <button type="submit" class="btn btn-danger">Close Listing</button>
+                    </form>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Comments section -->
+    <h3>Comments</h3>
+
+    <div class="mb-4">
+    {% for comment in listing.comments.all %}
+        <div class="card mb-2">
+        <div class="card-body">
+            <h6 class="card-subtitle mb-1 text-muted">
+            {{ comment.user.username }} 
+            <small class="text-muted">{{ comment.created_at|date:"M d, Y H:i" }}</small>
+            </h6>
+            <p class="card-text">{{ comment.text }}</p>
+        </div>
+        </div>
+    {% empty %}
+        <p>No comments yet. Be the first to comment!</p>
+    {% endfor %}
+    </div>
+
+    <!-- Add comment form -->
+    {% if user.is_authenticated %}
+    <div class="card p-3">
+        <h5>Add a Comment</h5>
+        <form method="POST">
+            {% csrf_token %}
+            {{ comment_form|crispy }}
+            <input type="hidden" name="action" value="comment_submit">
+            <button type="submit" class="btn btn-primary">Submit Comment</button>
+        </form>
+    </div>
+    {% else %}
+    <p><a href="{% url 'login' %}">Log in</a> to write a comment.</p>
+    {% endif %}
+
+</div>
+
 {% endblock %}
