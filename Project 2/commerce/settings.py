@@ -126,3 +126,6 @@ STATIC_URL = '/static/'
 # Crispy-forms settings
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+# auto-incrementing ID
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
