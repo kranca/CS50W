@@ -11,8 +11,10 @@ from .forms import CommentForm, ListingForm
 
 
 def index(request):
+    category_dict = Listing.CATEGORY_CHOICES
     return render(request, "auctions/index.html", {
-        "listings" : Listing.objects.all()
+        "listings" : Listing.objects.all(),
+        "category_dict" : category_dict
     })
 
 
@@ -78,13 +80,20 @@ def register(request):
 def listing_view(request, listing_id):
     listing = get_object_or_404(Listing, pk=listing_id)
     comment_form = CommentForm()
+    bids = listing.bids.order_by("-offer")
+    user_won = False
+
+    if not listing.is_active and bids.exists():
+        highest_bid = bids.first()
+        if highest_bid.user.username == request.user.username:
+            user_won = True
 
     if request.user in listing.watchers.all():
         is_in_watchlist = True
     else:
         is_in_watchlist = False
 
-    if request.method == "POST":
+    if request.method == "POST":        
         action = request.POST.get("action")
 
         if action == "bid":
@@ -127,7 +136,15 @@ def listing_view(request, listing_id):
         "listing" : listing,
         "bids" : listing.bids.order_by("-offer"),
         "comment_form" : comment_form,
-        "is_in_watchlist" : is_in_watchlist
+        "is_in_watchlist" : is_in_watchlist,
+        "user_won" : user_won
+    })
+
+def category_view(request, category_key):
+    category = dict(Listing.CATEGORY_CHOICES)[category_key]
+    return render(request, "auctions/category_view.html", {
+        "listings" : Listing.objects.filter(category=category_key),
+        "category" : category
     })
 
 @login_required
@@ -142,7 +159,7 @@ def create_new_listing_view(request):
     else:
         form = ListingForm()
 
-    return render(request, "auctions/new_listing.html", {
+    return render(request, "auctions/add_listing.html", {
         "form": form
     })
 

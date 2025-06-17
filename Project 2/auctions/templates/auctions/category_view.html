@@ -1,11 +1,7 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Categories</h2>
-        {% for category_key, category in category_dict %}
-            <a href="{% url 'category_view' category_key %}">{{ category }}</a>
-        {% endfor %}
-    <h2>Active Listings</h2>
+    <h2>{{ category }}</h2>
 
     <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for listing in listings %}
@@ -13,7 +9,7 @@
                 {% include "auctions/partials/listing_card.html" %}
             {% endif %}
             {% empty %}
-                <p>No listings available.</p>
+                <p>No listings available for {{ category }}.</p>
         {% endfor %}
     </div>
 {% endblock %}

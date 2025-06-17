@@ -69,7 +69,7 @@ class Bid(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="bids_users"
+        related_name="bids"
     )
     offer = models.DecimalField(
         max_digits=7,
