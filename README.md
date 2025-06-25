@@ -9,4 +9,4 @@ This repository contains my completed projects from [CS50's Web Programming with
 - Python and Django
 - SQL and data modeling
 - User authentication
-- APIs, JavaScript, and front-end frameworks
+- APIs, React and front-end frameworks
