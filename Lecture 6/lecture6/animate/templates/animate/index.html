@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Animate
+{% endblock %}
+
+{% block extra_head %}
+    <style>
+        @keyframes move-grow {
+            0% {
+                font-size: 20px;
+                left: 0%;
+            }
+            50% {
+                font-size: 100px;
+                left: 50%;
+            }
+            100% {
+                font-size: 20px;
+                left: 0%;
+            }
+        }
+
+        h1 {
+            animation-name: move-grow;
+            animation-duration: 2s;
+            animation-fill-mode: forwards;
+            animation-iteration-count: infinite;
+            position: relative;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const h1 = document.querySelector('h1');
+            h1.style.animationPlayState = 'paused';
+
+            document.querySelector('button').onclick = () => {
+                if (h1.style.animationPlayState === 'paused') {
+                    h1.style.animationPlayState = 'running';
+                } else {
+                    h1.style.animationPlayState = 'paused';
+                }
+            }
+        });
+    </script>
+{% endblock %}
+
+{% block body %}
+    <button>Click here!</button>
+    <h1>Welcome!</h1>
+{% endblock %}

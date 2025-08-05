@@ -1,0 +1,45 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% block title %}
+
+        {% endblock %}
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+
+    {% block extra_head %}
+    
+    {% endblock %}
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Lecture 6</h2>
+            <ul>
+                <li><a href="{% url 'singlepage:index' %}">Single Page</a></li>
+                <li><a href="{% url 'singlepage1:index' %}">Single Page 1</a></li>
+                <li><a href="{% url 'singlepage2:index' %}">Single Page 2</a></li>
+                <li><a href="{% url 'scroll:scroll' %}">Scroll</a></li>
+                <li><a href="{% url 'scroll:index' %}">Scroll - posts</a></li>
+                <li><a href="{% url 'animate:index' %}">Animate</a></li>
+                <li><a href="{% url 'scroll:hide' %}">Hide</a></li>
+                <li><a href="{% url 'react:index' %}">React</a></li>
+                <li><a href="{% url 'react:counter' %}">React - Counter</a></li>
+                <li><a href="{% url 'react:addition' %}">React - Addition</a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            {% block body %}
+            
+
+            {% endblock %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Scroll - Posts
+{% endblock %}
+
+{% block extra_head %}
+    <style>
+        .post {
+            background-color: #77dd11;
+            padding: 20px;
+            margin: 10px;
+        }
+    </style>
+
+    <script>
+        // Start with first post
+        let counter = 1;
+
+        // Load posts 20 at a time
+        const quantity = 20;
+
+        // When DOM loads, render first 20 posts
+        document.addEventListener('DOMContentLoaded', load);
+
+        // if scrolled to bottom, load next 20 posts
+        window.onscroll = () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+                load();
+            }
+        };
+
+        // Load set of posts
+        function load() {
+            const start = counter;
+            const end = start + quantity - 1;
+            counter = end + 1;
+
+            // Get new posts and add them
+            fetch(`/scroll/posts?start=${start}&end=${end}`)
+            .then(response => response.json())
+            .then(data => {
+                data.posts.forEach(add_post);
+            })
+        };
+
+        // Add a new post with given contents to DOM
+        function add_post(contents) {
+            // Create new post
+            const post = document.createElement('div');
+            post.className = 'post';
+            post.innerHTML = contents;
+
+            // Add post to DOM
+            document.querySelector('#posts').append(post);
+        };
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div id="posts"></div>
+{% endblock %}

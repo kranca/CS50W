@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Scroll
+{% endblock %}
+
+{% block extra_head %}
+
+    <script>
+        window.onscroll = () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+                document.querySelector('.main-content').style.background = 'green';
+            } else {
+                document.querySelector('.main-content').style.background = 'white';
+            }
+        }
+    </script>
+{% endblock %}
+
+{% block body %}
+    {% for i in numbers %}
+        <p>{{ i }}</p>
+    {% endfor %}
+{% endblock %}

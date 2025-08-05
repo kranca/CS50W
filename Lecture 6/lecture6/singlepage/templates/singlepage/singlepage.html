@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Single page
+{% endblock %}
+
+{% block extra_head %}
+    <style>
+        .special-content {
+            display: none;
+        }
+    </style>
+    <script>
+        function showPage(page) {
+            document.querySelectorAll('div.special-content').forEach(div => {
+                div.style.display = 'none';
+            })
+            document.querySelector(`#${page}`).style.display = 'block';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('button').forEach(button => {
+                button.onclick = function() {
+                    showPage(this.dataset.page);
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block body %}
+    <button data-page="page1">Page 1</button>
+    <button data-page="page2">Page 2</button>
+    <button data-page="page3">Page 3</button>
+    <div class="special-content" id="page1">
+        <h1>This is page 1</h1>
+    </div>
+    <div class="special-content" id="page2">
+        <h1>This is page 2</h1>
+    </div>
+    <div class="special-content" id="page3">
+        <h1>This is page 3</h1>
+    </div>
+{% endblock %}
