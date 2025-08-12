@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
   document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
   document.querySelector('#compose').addEventListener('click', compose_email);
+  document.querySelector('#compose-form').addEventListener('submit', send_email);
 
   // By default, load the inbox
   load_mailbox('inbox');
@@ -21,50 +22,51 @@ function compose_email() {
   document.querySelector('#compose-subject').value = '';
   document.querySelector('#compose-body').value = '';
 
-  document.querySelector('#compose-form').onsubmit = function(event) {
-    event.preventDefault();
-    const recipients = document.querySelector('#compose-recipients').value;
-    const subject = document.querySelector('#compose-subject').value;
-    const body = document.querySelector('#compose-body').value;
+  send_email();
+}
 
-    console.log('Submitting email: ', { recipients, subject, body });
+function send_email(event) {
 
-    console.log(JSON.stringify({
+  event.preventDefault();
+  const recipients = document.querySelector('#compose-recipients').value;
+  const subject = document.querySelector('#compose-subject').value;
+  const body = document.querySelector('#compose-body').value;
+
+  console.log(JSON.stringify({
+    recipients: recipients,
+    subject: subject,
+    body: body
+  }));
+
+  fetch('/emails', {
+    method: 'POST',
+    body: JSON.stringify({
       recipients: recipients,
       subject: subject,
       body: body
+    })
+  })
+  .then(response => {
+    const status = response.status;
+    // const message = response.statusText;
+
+    return response.json().then(data => ({
+      status: status,
+      response: data
     }));
+  })
+  .then(result => {
+    console.log(result);
+    if (result.status === 201) {
+      load_mailbox('sent');
+    } else {
+      console.log('Something went wrong: ', result.response)
+    }
 
-    fetch('/emails', {
-      method: 'POST',
-      body: JSON.stringify({
-        recipients: recipients,
-        subject: subject,
-        body: body
-      })
-    })
-    .then(response => {
-      const status = response.status;
-      // const message = response.statusText;
-
-      return response.json().then(data => ({
-        status: status,
-        response: data
-      }));
-    })
-    .then(result => {
-      console.log(result);
-      if (result.status === 201) {
-        load_mailbox('sent');
-      } else {
-        console.log('Something went wrong: ', result.response)
-      }
-
-    })
-    .catch(error => {
-      console.log('Error: ', error)
-    });
-  }
+  })
+  .catch(error => {
+    console.log('Error: ', error)
+  });
 }
 
 function load_mailbox(mailbox) {
@@ -76,33 +78,14 @@ function load_mailbox(mailbox) {
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
 
-  if (mailbox === 'inbox') {
-    fetch('emails/inbox')
-    .then(response => response.json())
-    .then(emails => {
-      emails.forEach(email_item => {
-        render_email(email_item);
-      });
-    })
-  } else if (mailbox === 'sent') {
-    fetch('emails/sent')
-    .then(response => response.json())
-    .then(emails => {
-      emails.forEach(email_item => {
-        render_email(email_item);
-      });
-    })
-  } else if (mailbox === 'archive') {
-    fetch('emails/archive')
-    .then(response => response.json())
-    .then(emails => {
-      emails.forEach(email_item => {
-        render_email(email_item);
-      });
-    })
-  } else {
-    console.log('Invalid mailbox');
-  }
+  fetch(`emails/${mailbox}`)
+  .then(response => response.json())
+  .then(emails => {
+    emails.forEach(email_item => {
+      render_email(email_item);
+    });
+  })
+  .catch(err => console.error('Failed to load mailbox: ', err));
 }
 
 function render_email(email_item) {
@@ -162,7 +145,7 @@ function view_email(email_id) {
     emailsView.appendChild(emailContainer);
   
     // Button events
-    // toolbar.querySelector('#reply-btn').addEventListener('click', () => reply_email(email));
+    toolbar.querySelector('#reply-btn').addEventListener('click', () => reply_email(email_item));
     toolbar.querySelector('#mark-unread-btn').addEventListener('click', () => toggle_read(email_item.id, email_item.read));
     toolbar.querySelector('#archive-btn').addEventListener('click', () => toggle_archive(email_item.id, email_item.archived));
   });
@@ -190,4 +173,18 @@ function toggle_archive(email_id, is_archived) {
   .then(() => {
     load_mailbox('inbox');
   });
+}
+
+function reply_email(email_item) {
+
+  // Show compose view and hide other views
+  document.querySelector('#emails-view').style.display = 'none';
+  document.querySelector('#compose-view').style.display = 'block';
+
+  // Pre fill email content
+  document.querySelector('#compose-recipients').value = email_item.sender;
+  document.querySelector('#compose-subject').value = `Re: ${email_item.subject}`;
+  document.querySelector('#compose-body').value = `\n_____\nOn ${email_item.timestamp} ${email_item.sender} wrote:\n\n${email_item.body}`;
+
+  send_email();
 }
